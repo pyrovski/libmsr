@@ -26,9 +26,9 @@
 #define NUM_SOCKETS 2
 #define NUM_CORES_PER_SOCKET 8 
 enum{
-	MSR_AND,
-	MSR_OR,
-	MSR_XOR
+  MSR_AND,
+  MSR_OR,
+  MSR_XOR
 };
 
 // Depending on their function, MSRs can be addressed at either
@@ -46,16 +46,16 @@ enum{
 extern "C" {
 #endif
 
-int init_msr();
-void finalize_msr();
-void write_msr(int socket, off_t msr, uint64_t val);
-void write_msr_all_cores(int socket, off_t msr, uint64_t val);
-void write_msr_all_cores_v(int socket, off_t msr, uint64_t *val);
-void write_msr_single_core(int socket, int core, off_t msr, uint64_t val);
+  int init_msr();
+  void finalize_msr();
+  void write_msr(int socket, off_t msr, uint64_t val);
+  void write_msr_all_cores(int socket, off_t msr, uint64_t val);
+  void write_msr_all_cores_v(int socket, off_t msr, uint64_t *val);
+  void write_msr_single_core(int socket, int core, off_t msr, uint64_t val);
 
-void read_msr(int socket, off_t msr, uint64_t *val);
-void read_msr_all_cores_v(int socket, off_t msr, uint64_t *val);
-void read_msr_single_core(int socket, int core, off_t msr, uint64_t *val);
+  void read_msr(int socket, off_t msr, uint64_t *val);
+  void read_msr_all_cores_v(int socket, off_t msr, uint64_t *val);
+  void read_msr_single_core(int socket, int core, off_t msr, uint64_t *val);
 
 #ifdef __cplusplus 
 }
