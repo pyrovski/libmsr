@@ -65,7 +65,7 @@ static int size;
         	tout_val.it_value.tv_sec = 0;
         	tout_val.it_value.tv_usec = 0;
 		setitimer(ITIMER_REAL, &tout_val, 0);
-		finalize_msr;
+		finalize_msr();
 	}
 	{{callfn}}
 {{endfn}}
