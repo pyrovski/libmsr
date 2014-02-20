@@ -23,13 +23,25 @@
 #define MSR_CORE_H
 #include <stdint.h>
 #include <sys/types.h>	// off_t
+#include <stdarg.h>
+
 #define NUM_SOCKETS 2
 #define NUM_CORES_PER_SOCKET 8 
+
 enum{
   MSR_AND,
   MSR_OR,
   MSR_XOR
 };
+
+typedef enum{
+  MSR_OK,
+  MSR_WARNING,
+  MSR_ERROR,
+  MSR_FATAL
+} MSR_STATUS;
+
+#define msr_msg(status, msg...) (_msr_msg(status, __FILE__, __LINE__, msg))
 
 // Depending on their function, MSRs can be addressed at either
 // the socket (aka cpu) or core level, and possibly the hardware
@@ -56,6 +68,23 @@ extern "C" {
   void read_msr(int socket, off_t msr, uint64_t *val);
   void read_msr_all_cores_v(int socket, off_t msr, uint64_t *val);
   void read_msr_single_core(int socket, int core, off_t msr, uint64_t *val);
+
+  inline MSR_STATUS _msr_msg(MSR_STATUS status, const char *file, const int line, 
+			     const char *str, ...){
+    int n;
+    va_list ap;
+  
+    const int buflen = 1000;
+    char buf[buflen];
+  
+    va_start(ap, str);
+    n = vsnprintf(buf, buflen, str, ap);
+    va_end(ap);
+    buf[buflen-1] = 0;
+  
+    fprintf(stderr, "%s::%d:\t%s\n", file, line, buf);
+    return status;
+  }
 
 #ifdef __cplusplus 
 }

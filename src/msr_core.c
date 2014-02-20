@@ -53,30 +53,22 @@ init_msr(){
 
 			retVal = stat(filename, &statbuf);
 
-			if (retVal == -1) {
-			      snprintf(filename, 1024, "%s::%d  Error: stat failed on /dev/socket/%d/msr_safe, check if msr module is loaded\n", __FILE__, __LINE__, i*NUM_CORES_PER_SOCKET+j);
-					
-				return -1; 
-			}	
+			if (retVal == -1)
+			  return msr_msg(MSR_ERROR, 
+					 "Error: stat failed on %s; check if msr module is loaded", 
+					 filename);
 		
-			if(!(statbuf.st_mode & S_IRUSR) || !(statbuf.st_mode & S_IWUSR)){
-				snprintf(filename, 1024, "%s::%d  Read/write permissions denied on /dev/socket/%d/msr_safe\n", __FILE__, __LINE__, i*NUM_CORES_PER_SOCKET+j);
-		
-				return -1;
-			}
- 
+			if(!(statbuf.st_mode & S_IRUSR) || !(statbuf.st_mode & S_IWUSR))
+			  return msr_msg(MSR_ERROR, 
+					 "Read/write permissions denied on %s", filename);
 
 			core_fd[i][j] = open( filename, O_RDWR );
 
-			if(core_fd[i][j] == -1){
-				snprintf(filename, 1024, "%s::%d  Error opening /dev/socket/%d/msr_safe, check if msr module is loaded. \n", __FILE__, __LINE__, i*NUM_CORES_PER_SOCKET+j);
-				perror(filename);
-
-				return -1;
-			}
-
+			if(core_fd[i][j] == -1)
+			  return msr_msg(MSR_ERROR, 
+					 "Error opening %s; check if msr module is loaded.", 
+					 filename);
 		}
-		
 	}
 
 	initialized = 1;
@@ -93,7 +85,7 @@ finalize_msr(){
 			if(core_fd[i][j]){
 				rc = close(core_fd[i][j]);
 				if( rc != 0 ){
-					snprintf(filename, 1024, "%s::%d  Error closing file /dev/socket/%d/msr\n", 
+					snprintf(filename, 1024, "%s::%d  Error closing file /dev/cpu/%d/msr\n", 
 							__FILE__, __LINE__, i*NUM_CORES_PER_SOCKET+j);
 					perror(filename);
 				}
