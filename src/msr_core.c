@@ -79,16 +79,13 @@ init_msr(){
 void 
 finalize_msr(){
 	int i, j, rc;
-	char filename[1025];
 	for( i=0; i<NUM_SOCKETS; i++){
 		for(j=0; j<NUM_CORES_PER_SOCKET; j++){
 			if(core_fd[i][j]){
 				rc = close(core_fd[i][j]);
-				if( rc != 0 ){
-					snprintf(filename, 1024, "%s::%d  Error closing file /dev/cpu/%d/msr\n", 
-							__FILE__, __LINE__, i*NUM_CORES_PER_SOCKET+j);
-					perror(filename);
-				}
+				if( rc != 0 )
+				  msr_pmsg(MSR_WARNING, "Error closing file /dev/cpu/%d/msr", 
+					   i*NUM_CORES_PER_SOCKET+j);
 			}else{
 				core_fd[i][j] = 0;
 			}
@@ -120,29 +117,30 @@ write_msr_all_cores_v(int socket, off_t msr, uint64_t *val){
 void
 write_msr_single_core(int socket, int core, off_t msr, uint64_t val){
 	int rc, core_fd_idx;
-	char error_msg[1025];
 	uint64_t actual;
 	core_fd_idx = socket*NUM_CORES_PER_SOCKET+core;
 	rc = pwrite( core_fd[socket][core], &val, (size_t)sizeof(uint64_t), msr );
 	if( rc != sizeof(uint64_t) ){
-		snprintf( error_msg, 1024, "%s::%d  pwrite returned %d.  core_fd[%d][%d]=%d, socket=%d, core=%d socket+core=%d msr=%ld (0x%lx).  errno=%d\n", 
-				__FILE__, __LINE__, rc, socket, core, core_fd[socket][core], socket, core, core_fd_idx, msr, msr, errno );
-		perror(error_msg);
+	  msr_pmsg(MSR_WARNING, "pwrite returned %d. "
+		   "core_fd[%d][%d]=%d, socket=%d, core=%d"
+		   "socket+core=%d msr=%ld (0x%lx).  errno=%d", 
+		   rc, socket, core, core_fd[socket][core], socket, core, 
+		   core_fd_idx, msr, msr, errno);
 	}
 
 	//Verify the value that was written
 	 rc = pread(core_fd[socket][core], &actual, (size_t)sizeof(uint64_t), msr);
 	if( rc != sizeof(uint64_t) ){
-                snprintf( error_msg, 1024, "%s::%d  Verifying the value that was written: pread returned %d.  core_fd[%d][%d]=%d, socket=%d, core=%d socket+core=%d msr=%ld (0x%lx).  errno=%d\n",
-                                __FILE__, __LINE__, rc, socket, core, core_fd[socket][core], socket, core, core_fd_idx, msr, msr, errno );
-                perror(error_msg);
+	  msr_pmsg(MSR_WARNING, "Verifying the value that was written: "
+		   "pread returned %d.  core_fd[%d][%d]=%d, socket=%d, "
+		   "core=%d socket+core=%d msr=%ld (0x%lx).  errno=%d");
         }
 	if(actual == val){
-		fprintf(stderr,"writemsr: Verification successful. core_fd[%d][%d]=%d, socket=%d, core=%d socket+core=%d msr=%ld (0x%lx).\n", socket, core, core_fd[socket][core], socket, core, core_fd_idx, msr,msr);
+	  msr_msg(MSR_OK, "writemsr: Verification successful. core_fd[%d][%d]=%d, socket=%d, core=%d socket+core=%d msr=%ld (0x%lx).", socket, core, core_fd[socket][core], socket, core, core_fd_idx, msr,msr);
 	}
 	else {
-             snprintf(error_msg, 1024, "%s::%d  writemsr: verification failed. core_fd[%d][%d]=%d, socket=%d, core=%d socket+core=%d msr=%ld (0x%lx).  errno=%d\n",
-                                __FILE__, __LINE__, socket, core, core_fd[socket][core], socket, core, core_fd_idx, msr, msr, errno );
+	  msr_msg(MSR_WARNING, "writemsr: verification failed. core_fd[%d][%d]=%d, socket=%d, core=%d socket+core=%d msr=%ld (0x%lx).  errno=%d\n",
+		  socket, core, core_fd[socket][core], socket, core, core_fd_idx, msr, msr, errno);
 	}
 
 }
@@ -163,13 +161,13 @@ read_msr_all_cores_v(int socket, off_t msr, uint64_t *val){
 void 
 read_msr_single_core(int socket, int core, off_t msr, uint64_t *val){
 	int rc, core_fd_idx;
-	char error_msg[1025];
 	core_fd_idx = socket*NUM_CORES_PER_SOCKET+core;
 	rc = pread( core_fd[socket][core], (void*)val, (size_t)sizeof(uint64_t), msr );
 	if( rc != sizeof(uint64_t) ){
-		snprintf( error_msg, 1024, "%s::%d  pread returned %d.  core_fd[%d][%d]=%d, socket=%d, core=%d socket+core=%d msr=%ld (0x%lx).  errno=%d\n", 
-				__FILE__, __LINE__, rc, socket, core, core_fd[socket][core], socket, core, core_fd_idx, msr, msr, errno );
-		perror(error_msg);
+	  msr_pmsg(MSR_WARNING, "pread returned %d.  core_fd[%d][%d]=%d, "
+		   "socket=%d, core=%d socket+core=%d msr=%ld (0x%lx).  errno=%d",
+		   rc, socket, core, core_fd[socket][core], socket, core, 
+		   core_fd_idx, msr, msr, errno);
 	}
 }
 

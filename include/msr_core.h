@@ -41,7 +41,11 @@ typedef enum{
   MSR_FATAL
 } MSR_STATUS;
 
-#define msr_msg(status, msg...) (_msr_msg(status, __FILE__, __LINE__, msg))
+// print to stderr
+#define msr_msg(status, msg...) (_msr_msg(status, __FILE__, __LINE__, 0, msg))
+
+// print to stderr via perror()
+#define msr_pmsg(status, msg...) (_msr_msg(status, __FILE__, __LINE__, 1, msg))
 
 // Depending on their function, MSRs can be addressed at either
 // the socket (aka cpu) or core level, and possibly the hardware
@@ -69,8 +73,8 @@ extern "C" {
   void read_msr_all_cores_v(int socket, off_t msr, uint64_t *val);
   void read_msr_single_core(int socket, int core, off_t msr, uint64_t *val);
 
-  inline MSR_STATUS _msr_msg(MSR_STATUS status, const char *file, const int line, 
-			     const char *str, ...){
+  inline static MSR_STATUS _msr_msg(MSR_STATUS status, const char *file, const int line, 
+			     const int use_perror, const char *str, ...){
     int n;
     va_list ap;
   
@@ -82,7 +86,13 @@ extern "C" {
     va_end(ap);
     buf[buflen-1] = 0;
   
-    fprintf(stderr, "%s::%d:\t%s\n", file, line, buf);
+    if(use_perror){
+      char pbuf[buflen];
+      snprintf(pbuf, buflen, "%s::%d:\t%s", file, line, buf);
+      pbuf[buflen-1] = 0;
+      perror(pbuf);
+    } else
+      fprintf(stderr, "%s::%d:\t%s\n", file, line, buf);
     return status;
   }
 
