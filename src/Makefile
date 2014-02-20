@@ -1,10 +1,12 @@
 CFLAGS=-fPIC -Wall -O3 -I../include
 CC=gcc
 
-all: libmsr
+target=../lib/libmsr.so
 
-libmsr: msr_core.o msr_rapl.o msr_thermal.o msr_clocks.o signalCombined.o 
-	mpicc -DPIC -fPIC -g -shared  -Wl,-soname,libmsr.so -o ../lib/libmsr.so $^
+all: $(target)
+
+$(target): msr_core.o msr_rapl.o msr_thermal.o msr_clocks.o signalCombined.o 
+	mpicc -DPIC -fPIC -g -shared  -Wl,-soname,libmsr.so -o $(target) $^
 
 msr_core.o:   		Makefile msr_core.c       ../include/msr_core.h 
 msr_rapl.o:   		Makefile msr_rapl.c       ../include/msr_rapl.h
@@ -13,11 +15,4 @@ msr_clocks.o: 		Makefile msr_clocks.c     ../include/msr_clocks.h
 signalCombined.o: 	Makefile signalCombined.c ../include/signalCombined.h
 
 clean:
-	rm -f *.o *.so 
-
-
-	
-
-  
-
-
+	rm -f *.o $(target)
