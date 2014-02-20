@@ -11,8 +11,7 @@ $(libPowThermTest): powerThermalTest.c
 	mpicc $(CFLAGS) -shared -Wl,-soname,libPowThermTest.so -o $@ $^
 
 helloWorldMPI: helloWorld_mpi.c $(libPowThermTest)
-	mpicc $(CFLAGS) -DPIC -o helloWorldMPI -Wl,-rpath=/home/shoga1/libmsr -L ${MYLIBDIR} -lmsr -L${MYLIBDIR} -lPowThermTest helloWorld_mpi.c 
-
+	mpicc $(CFLAGS) -DPIC -o helloWorldMPI -Wl,-rpath=../lib -L ${MYLIBDIR} -lmsr -lPowThermTest helloWorld_mpi.c
 thermalTest.c: thermal.w
 	$(WRAP) -g -o thermalTest.c thermal.w
 
