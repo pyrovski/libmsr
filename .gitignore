@@ -1,4 +1,4 @@
-test/libmsr_test
+libmsr_*test
 .*.swp
 *.o
 app
