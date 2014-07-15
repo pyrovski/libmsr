@@ -37,7 +37,7 @@ void
 dump_clocks_terse_label(){
 	int thread_idx;
 	for(thread_idx=0; thread_idx<NUM_THREADS; thread_idx++){
-		fprintf(stdout, "aperf%02d mperf%02d tsc%02d ", 
+		fprintf(stdout, "aperf%02d\tmperf%02d\ttsc%02d\t", 
 			thread_idx, thread_idx, thread_idx);
 	}
 }
@@ -50,7 +50,7 @@ dump_clocks_terse(){
 	read_all_mperf(mperf_val);
 	read_all_tsc  (tsc_val);
 	for(thread_idx=0; thread_idx<NUM_THREADS; thread_idx++){
-		fprintf(stdout, "%20lu %20lu %20lu ", 
+		fprintf(stdout, "0x%llx\t0x%llx\t0x%llx\t", 
 			aperf_val[thread_idx], mperf_val[thread_idx], tsc_val[thread_idx]);
 	}
 }

@@ -3,6 +3,7 @@
 #include "../include/msr_core.h"
 #include "../include/msr_rapl.h"
 #include "../include/msr_thermal.h"
+#include "../include/msr_clocks.h"
 #ifdef MPI
 #include <mpi.h>
 #endif
@@ -88,6 +89,10 @@ int main(int argc, char** argv){
 	#endif
 	
 	init_msr();
+	dump_clocks_terse_label();
+	printf("\n");
+	dump_clocks_terse();
+	printf("\n");
 	set_limits();
 	get_limits();
 	rapl_test();
@@ -96,6 +101,8 @@ int main(int argc, char** argv){
 	#ifdef MPI
 	MPI_Finalize();
 	#endif
+	dump_clocks_terse();
+	printf("\n");
 
 	return 0;
 }
