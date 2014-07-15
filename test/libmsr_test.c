@@ -97,11 +97,11 @@ int main(int argc, char** argv){
 	get_limits();
 	rapl_test();
 	rapl_r_test();
+	dump_clocks_terse();
 	finalize_msr();
 	#ifdef MPI
 	MPI_Finalize();
 	#endif
-	dump_clocks_terse();
 	printf("\n");
 
 	return 0;
