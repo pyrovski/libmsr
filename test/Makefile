@@ -1,11 +1,15 @@
+libs=-L ../lib -Wl,-rpath ../lib -lmsr
+
+all: libmsr_test libmsr_powercap_test libmsr_mpi_test
+
 libmsr_test: libmsr_test.c 
-	gcc -Wall -o libmsr_test libmsr_test.c -L ../lib -lmsr
+	gcc -Wall -o libmsr_test libmsr_test.c $(libs)
 
 libmsr_powercap_test: libmsr_powercap_test.c
-	gcc -Wall -o libmsr_powercap_test libmsr_powercap_test.c -L ../lib -lmsr
+	gcc -Wall -o libmsr_powercap_test libmsr_powercap_test.c $(libs)
 
 libmsr_mpi_test: libmsr_test.c 
-	mpicc -Wall -DMPI -o libmsr_mpi_test libmsr_test.c -L ../lib -lmsr
+	mpicc -Wall -DMPI -o libmsr_mpi_test libmsr_test.c $(libs)
 
 mpi: mpi_test.c
 	mpicc -Wall -o mpi_test mpi_test.c -L../lib -lgaramond 
